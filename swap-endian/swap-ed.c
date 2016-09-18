@@ -29,7 +29,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	int out_fd = open("output.bin", O_RDWR | O_CREAT, 777);
+	//int out_fd = open("output.bin", O_RDWR | O_CREAT, 777);
+	int out_fd = open("output.bin", O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
 	if (out_fd < 0){
 		printf("open out_fd fail !\n");
 		return -1;
