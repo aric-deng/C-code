@@ -1,0 +1,1 @@
+cmd_/home/dhs/temp/switch/switch.ko := arm-goke-linux-gnueabi-ld -EL -r  -T /home/dhs/code/gk8602_v1.1.1_sdk/linux/kernel/3.4.43/scripts/module-common.lds --build-id  -o /home/dhs/temp/switch/switch.ko /home/dhs/temp/switch/switch.o /home/dhs/temp/switch/switch.mod.o
