@@ -1,1 +1,0 @@
-cmd_/home/dhs/temp/hello-mod/hello.ko := arm-goke-linux-gnueabi-ld -EL -r  -T /home/dhs/code/gk8602_v1.1.1_sdk/linux/kernel/3.4.43/scripts/module-common.lds --build-id  -o /home/dhs/temp/hello-mod/hello.ko /home/dhs/temp/hello-mod/hello.o /home/dhs/temp/hello-mod/hello.mod.o
