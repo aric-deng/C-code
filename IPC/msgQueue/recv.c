@@ -20,8 +20,11 @@ int main()
 	struct my_msg_st some_data;
 	long int msg_to_receive = 0;
 
+<<<<<<< HEAD
 	//get msgQueue identifier associated with key, if no msgQueue with key exists, a new msgQueue is created according to IPC_CREAT
 	//0666 is the same with file operation mode: rwx
+=======
+>>>>>>> 02816b63cc15e6bd6615e9e714cc8e67d27ba436
 	msgid = msgget((key_t)1234, 0666 | IPC_CREAT);
 
 	if (msgid == -1) 
@@ -32,9 +35,12 @@ int main()
 
 	while(running) 
 	{
+<<<<<<< HEAD
 		//ssize_t msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg);
 		//removes a message from the msgQueue specified by msgid, and place in the buffer msgp
 		//If msgtyp is 0, then the first message in the queue is read.
+=======
+>>>>>>> 02816b63cc15e6bd6615e9e714cc8e67d27ba436
 		if (msgrcv(msgid, (void *)&some_data, BUFSIZ, msg_to_receive, 0) == -1) 
 		{
 			fprintf(stderr, "msgrcv failed with error: %d\n", errno);
@@ -48,8 +54,11 @@ int main()
 		}
 	}
 
+<<<<<<< HEAD
 	//int msgctl(int msqid, int cmd, struct msqid_ds *buf);
 	//IPC_RMID: Immediately remove the message queue, awakening all waiting reader and writer processes
+=======
+>>>>>>> 02816b63cc15e6bd6615e9e714cc8e67d27ba436
 	if (msgctl(msgid, IPC_RMID, 0) == -1) 
 	{
 		fprintf(stderr, "msgctl(IPC_RMID) failed\n");

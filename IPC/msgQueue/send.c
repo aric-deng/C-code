@@ -21,9 +21,12 @@ int main()
 	int msgid;
 	char buffer[BUFSIZ];
 
+<<<<<<< HEAD
 	//int msgget(key_t key, int msgflg);
 	//get msgQueue identifier associated with key, if no msgQueue with key exists, a new msgQueue is created according to IPC_CREAT
 	//0666 is the same with file operation mode: rwx
+=======
+>>>>>>> 02816b63cc15e6bd6615e9e714cc8e67d27ba436
 	msgid = msgget((key_t)1234, 0666 | IPC_CREAT);
 
 	if (msgid == -1) 
@@ -40,8 +43,11 @@ int main()
 		some_data.my_msg_type = 1;
 		strcpy(some_data.some_text, buffer);
 
+<<<<<<< HEAD
 		//int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg);
 		//append the msg data to msgQueue whose identifier is msgid
+=======
+>>>>>>> 02816b63cc15e6bd6615e9e714cc8e67d27ba436
 		if (msgsnd(msgid, (void *)&some_data, MAX_TEXT, 0) == -1) 
 		{
 			fprintf(stderr, "msgsnd failed\n");
