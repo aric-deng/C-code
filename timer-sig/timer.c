@@ -30,6 +30,7 @@ int main (int argc, char *argv[])
 	setitimer (ITIMER_VIRTUAL, &timer, NULL);
 
 	/* Do busy work. */
-	while (1);
-		sleep(1);
+	while (1){
+		sleep(5);
+	}
 }
