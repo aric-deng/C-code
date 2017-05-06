@@ -22,6 +22,8 @@ static int parse_wav_file(char *name)
 //	wave_header_t * pwh;
 	wav_data_t w_dat;
 	u8 buf[128] = {0};
+	char * pSuffix;
+	char output_name[256] = {0};
 
 	memset(&wh, 0, sizeof(wh));
 	memset(&w_dat, 0, sizeof(w_dat));
@@ -131,30 +133,36 @@ static int parse_wav_file(char *name)
 	printf("data len:%d\n", w_dat.dat_len);
 	printf("raw data offset, i:%d\n", i);
 	
-	lseek(fd, i, SEEK_SET);
-	
-	int out_fd = open("output.pcm", O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
-	if (out_fd < 0){
-		printf("open out_fd fail !\n");
-		return -1;
-	}
-	
-	//save only raw pcm data.
-	while(1){
-		cnt = read(fd, buf, sizeof(unsigned int));
-		if (cnt == 0){
-			printf("reach file end, return ! \n");
-			break;
+	if (!strncmp(&wh.riff, "RIFF", sizeof(wh.riff)) && !strncmp(&wh.wave_flag, "WAVE", sizeof(wh.wave_flag))) {
+		lseek(fd, i, SEEK_SET);
+		
+		//replace suffix to .pcm
+		strncpy(output_name, name, sizeof(output_name));
+		pSuffix = rindex(output_name, '.');
+		sprintf(pSuffix, ".pcm");
+		int out_fd = open(output_name, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
+		if (out_fd < 0){
+			printf("open out_fd fail !\n");
+			return -1;
 		}
 		
-		if (write(out_fd, buf, cnt) <= 0){
-			printf("write out_fd fail! \n");
-			break;
-		}	
+		//save only raw pcm data.
+		while(1){
+			cnt = read(fd, buf, sizeof(unsigned int));
+			if (cnt == 0){
+				printf("reach file end, return ! \n");
+				break;
+			}
+			
+			if (write(out_fd, buf, cnt) <= 0){
+				printf("write out_fd fail! \n");
+				break;
+			}	
+		}
+		close(out_fd);
 	}
 	
 	close(fd);
-	close(out_fd);
 	
 	return 0;
 }
