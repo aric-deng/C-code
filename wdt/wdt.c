@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/watchdog.h>
 
+static int wdt_timeout;
 
-static int app_wdt_enableWatchdog(void)
+static int app_wdt_enableWatchdog(int cnt)
 {
 	int wdg_fd;
 	int enable = WDIOS_ENABLECARD;
 	wdg_fd = open("/dev/watchdog", O_RDWR);
 	if(wdg_fd < 0){
-		printf("%s, line:%d, wdg_fd:%d \n", __func__, __LINE__, wdg_fd);
+		printf("%s, line:%d, wdg_fd:%d, %s \n", __func__, __LINE__, wdg_fd, strerror(errno));
 		return -1;
 	}
 
@@ -23,6 +25,15 @@ static int app_wdt_enableWatchdog(void)
 		return -1;
 	}
 
+	if(cnt > 0){
+		printf("wdt set timeout:%d \n", cnt);
+	    if (ioctl(wdg_fd, WDIOC_SETTIMEOUT, &cnt) < 0)
+		{
+			printf("app_wdt_setWatchdogTimeout ioctl error time_out =%ld\n", cnt);
+			return -1;
+		}	
+	}
+	
 	printf("app_wdt_enableWatchdog init  ok !\n");
 	close(wdg_fd);
 	return 0;
@@ -35,7 +46,7 @@ static int app_wdt_dsiableWatchdog(void)
 	
 	wdg_fd = open("/dev/watchdog", O_RDWR);
 	if(wdg_fd < 0){
-		printf("%s, line:%d, wdg_fd:%d \n", __func__, __LINE__, wdg_fd);
+		printf("%s, line:%d, wdg_fd:%d, %s \n", __func__, __LINE__, wdg_fd, strerror(errno));
 		return -1;
 	}
 	
@@ -63,7 +74,8 @@ int main(int argc, char *argv[])
 	if (switchFlag == 0){
 		app_wdt_dsiableWatchdog();
 	} else if (switchFlag == 1){
-		app_wdt_enableWatchdog();
+		wdt_timeout = strtoul(argv[2], 0, 0);
+		app_wdt_enableWatchdog(wdt_timeout);
 	} else {
 		printf("argument not valid! \n");
 		exit(1);
