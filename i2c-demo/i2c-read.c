@@ -1,12 +1,56 @@
+#include <stdio.h>
 #include <sys/ioctl.h> 
 #include <fcntl.h> 
 #include <linux/i2c-dev.h> 
 #include <linux/i2c.h> 
 
 #define MAX_I2C_MSG          2
+#define I2C_DBG		printf
+
+static unsigned char i2c_read(int i2c_fd, unsigned char dev_addr, unsigned short  reg_addr)
+{
+    unsigned char rxdata;
+
+    if (ioctl(i2c_fd, I2C_SLAVE_FORCE, dev_addr) < 0)
+    {
+        I2C_DBG("Fail to set i2c_addr\n");
+        //close(g_i2c_fd);
+        return '\0';
+    }
+
+    char sendbuffer[2];
+    sendbuffer[0] = reg_addr >> 8;
+    sendbuffer[1] = reg_addr;
+//   I2C_DBG("sendbuffer[0] %x sendbuffer[1] %x\n", sendbuffer[0], sendbuffer[1]);
+    if (sendbuffer[0] == 0)//reg_addr is one byte
+    {
+        if (write(i2c_fd, &reg_addr, 1) != 1)
+        {
+            I2C_DBG("Fail to read send reg_addr data\n");
+            return '\0';
+        }
+    }
+    else//reg_addr is one byte
+    {
+        if (write(i2c_fd, &sendbuffer, 2) != 2)
+        {
+            I2C_DBG("Fail to read send reg_addr data\n");
+            return '\0';
+        }
+
+    }
+
+    if (read(i2c_fd, &rxdata, 1) != 1)
+    {
+        I2C_DBG("Fail to read read data\n");
+        return '\0';
+    }
+	
+    return rxdata;
+}
 
 int i2c_read_reg_data(int bus_id, unsigned char slave_address,
-		unsigned short reg_addr, int reg_addr_size, unsigned char *data)
+		unsigned short reg_addr, unsigned char *data)
 {
 	struct i2c_rdwr_ioctl_data work_queue;
 	unsigned char idx;
@@ -31,52 +75,11 @@ int i2c_read_reg_data(int bus_id, unsigned char slave_address,
 		return -1;
 	}
 	
-	work_queue.nmsgs = MAX_I2C_MSG; //msg numbers
-
-	work_queue.msgs = (struct i2c_msg*) malloc(
-			work_queue.nmsgs * sizeof(struct i2c_msg));
-	if (!work_queue.msgs)
-	{
-		printf("Memory alloc error\n");
-		close(fd);
-		return 0;
+	*data = i2c_read(fd, slave_address, reg_addr);
+	if (*data == '\0'){
+		ret = -1;		
 	}
-
-	if (reg_addr_size == 1)
-	{
-		val[0] = 0x00ff & reg_addr;
-	}
-	else if (reg_addr_size == 2)
-	{
-		val[0] = 0x00ff & (reg_addr >> 8);
-		val[1] = 0x00ff & reg_addr;
-	}
-
-	(work_queue.msgs[0]).len = reg_addr_size;
-	(work_queue.msgs[0]).addr = slave_address;
-	(work_queue.msgs[0]).buf = &val[0];
-
-	(work_queue.msgs[1]).len = 1/*data_len*/;
-	(work_queue.msgs[1]).flags = 1; //I2C_M_RD;
-	(work_queue.msgs[1]).addr = slave_address;
-	(work_queue.msgs[1]).buf = &val[0];
-	//work_queue.nmsgs = 2;
-
-	ioctl(fd, I2C_TIMEOUT, 2);
-	ioctl(fd, I2C_RETRIES, 1);
-
-	if (ioctl(fd, I2C_RDWR, (unsigned long) &work_queue) < 0)
-	{
-		ret=-1;
-		printf("Error  during  I2C_RDWR  ioctl  with  error  code:  %d\n", ret);
-	}
-	else
-	{
-		//printf("Read: Reg--%02x   Data--%02x  \n", reg_addr, val[0]);
-		if (data)
-			*data = val[0];
-	}
-	free(work_queue.msgs);
+	
 	close(fd);
 	return ret;
 }
@@ -95,7 +98,7 @@ int main(int argc, char* argv[])
 	//printf("dhs === 0x%02x, 0x%02x, 0x%02x \n", i2c_bus, dev_addr, reg_addr );
 
 	unsigned char val = 0;
-	int ret = i2c_read_reg_data(i2c_bus, dev_addr, reg_addr, 1, &val);
+	int ret = i2c_read_reg_data(i2c_bus, dev_addr, reg_addr, &val);
 	printf("=== dhs === read i2c:%d, slave_addr:0x%02x, reg_addr:0x%02x, val:0x%02x\n", i2c_bus, dev_addr, reg_addr, val);
   
 	return 0; 
