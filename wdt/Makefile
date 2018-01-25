@@ -5,8 +5,8 @@ STRIP := $(CROSS)strip
 CUR_DIR := $(shell pwd)
 
 #TARGET := audioPlayer
-SRC := wdt.c
-TARGET := wdt
+SRC := $(wildcard *.c)
+TARGET := $(patsubst %.c, %, $(SRC))
 
 DEP_INC_DIR =$(addprefix  -I, $(shell find $(CUR_DIR)/inc -type d))
 DEP_LIB_DIR =$(addprefix  -L, $(shell find $(CUR_DIR)/lib -type d))
