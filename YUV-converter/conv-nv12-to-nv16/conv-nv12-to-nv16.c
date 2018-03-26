@@ -23,19 +23,24 @@ typedef union uv16 {
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2){
-		printf("Usage: %s [filename] !\n", argv[0]);
+	if (argc < 4){
+		printf("Usage: %s [filename] [width] [height]!\n", argv[0]);
 		return -1;
 	}
 
 	int cnt = 0, i = 0, j = 0;
-	int width = 100, height = 200;
+	int width = atoi(argv[2]), height = atoi(argv[3]);
 	unsigned char tmp = 0;
 	char output_name[256] = {0};
 	unsigned char *buf, *out_buf, *y, *u, *v;
 	unsigned char *pout;
 	U_UV16 *uv;
 	char * pSuffix;
+	
+	if(width <= 0 || height <= 0){
+		printf("w/h invalid, w:%d, h:%d \n", width, height);
+		return -1;
+	}
 	
 	int fd = open(argv[1], O_RDONLY, 0);
 	if (fd < 0){
@@ -81,6 +86,8 @@ int main(int argc, char *argv[])
 
 	close(fd);
 	close(out_fd);
+	
+    printf("convert ok, output file:%s \n", output_name);
 	
 	return 0;
 }
