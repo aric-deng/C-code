@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/dhs/180/share/check_update_filename_valid/chk_update_filename_valid.c
+stdio.h
+-
+string.h
+-
+ctype.h
+-
+
