@@ -67,6 +67,14 @@ int i2c_read_reg_data(int bus_id, unsigned char slave_address,
 	{
 		fd = open("/dev/i2c-1", O_RDWR);
 	}
+	else if (bus_id == 2)
+	{
+		fd = open("/dev/i2c-2", O_RDWR);
+	}
+	else if (bus_id == 3)
+	{
+		fd = open("/dev/i2c-3", O_RDWR);
+	}
 	else
 		return -1;
 	
@@ -139,6 +147,14 @@ int i2c_write_reg_data(int bus_id, unsigned char slave_address,
 	{
 		fd = open("/dev/i2c-1", O_RDWR);
 	}
+	else if (bus_id == 2)
+	{
+		fd = open("/dev/i2c-2", O_RDWR);
+	}
+	else if (bus_id == 3)
+	{
+		fd = open("/dev/i2c-3", O_RDWR);
+	}
 	else
 		return -1;
 	
@@ -170,8 +186,13 @@ int main(int argc, char* argv[])
 	unsigned char val = 0;
 	//int ret = i2c_read_reg_data(i2c_bus, dev_addr, reg_addr, 1, &val);
 	int ret = i2c_write_reg_data(i2c_bus, dev_addr, reg_addr, reg_value);
-	ret = i2c_read_reg_data(i2c_bus, dev_addr, reg_addr, &val);
-	printf("=== dhs === set i2c:%d, slave_addr:0x%02x, reg_addr:0x%02x, val:0x%02x\n", i2c_bus, dev_addr, reg_addr, val);
-  
+	if (ret < 0){
+		printf("i2c write error, ret:%d \n", ret);
+		return -1;
+	} else {
+		ret = i2c_read_reg_data(i2c_bus, dev_addr, reg_addr, &val);
+		printf("=== dhs === set i2c:%d, slave_addr:0x%02x, reg_addr:0x%02x, val:0x%02x\n", i2c_bus, dev_addr, reg_addr, val);
+	}
+	
 	return 0; 
 }
